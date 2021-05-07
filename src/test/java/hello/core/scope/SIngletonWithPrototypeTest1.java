@@ -2,12 +2,14 @@ package hello.core.scope;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Provider;
 
 public class SIngletonWithPrototypeTest1 {
 
@@ -32,21 +34,25 @@ public class SIngletonWithPrototypeTest1 {
 
         ClientBean bean2 = ac.getBean(ClientBean.class);
         int count2 = bean2.logic();
-        Assertions.assertThat(count2).isEqualTo(2);
+        Assertions.assertThat(count2).isEqualTo(1);
 
     }
 
     static class ClientBean{
-        private final ProtypeBean prototypeBean;
+//        private final ProtypeBean prototypeBean;
 
         @Autowired
-        public ClientBean(ProtypeBean prototypeBean) {
-            this.prototypeBean = prototypeBean;
-        }
+        private Provider<ProtypeBean> protypeBeanProvider;
+
+//        @Autowired
+//        public ClientBean(ProtypeBean prototypeBean) {
+//            this.prototypeBean = prototypeBean;
+//        }
 
         public int logic(){
-            prototypeBean.addCount();
-            return prototypeBean.getCount();
+            ProtypeBean object = protypeBeanProvider.get();
+            object.addCount();
+            return object.getCount();
         }
     }
 
